@@ -1,0 +1,20 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Ваше сообщение
+{% endblock %}
+
+{% block content %}
+    <div class="features">
+      <h1>Ваше сообщение</h1>
+      <h3>{{ message.created_at }}</h3>
+      <p>{{ message.text }}</p>
+      <a href="{% url 'forum' %}" class="btn btn-light">Вернуться</a>
+      <a href="{% url 'forum-delete' message.id %}" class="btn btn-danger">Удалить</a>
+      {% if message.picture %}
+                    <img src="{{ message.picture.url }}" alt="Изображение" style="max-width: 300px;">
+      {% endif %}
+    </div>
+
+
+{% endblock %}

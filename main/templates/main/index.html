@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+
+
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <div class="mains">
+            <h1>Добро пожаловать</h1>
+            <h3>Это главная страница сайта, воспользуйся боковой панелью чтобы
+            перейти на интересующие тебя разделы</h3>
+            <a href="{% url 'about' %}" class="btn btn-light"><h4>Подробнее про сайт</h4></a>
+        <img src=""
+             style="float: left; margin-top: -1000px; max-width: 500px;">
+    </div>
+{% endblock %}
+

@@ -1,0 +1,68 @@
+{% extends 'main/layout.html' %}
+
+
+{% block title %}
+    Профиль
+{% endblock %}
+
+
+{% block content %}
+    <div class="features">
+
+        <h1>Ваш профиль</h1>
+        <h3>{{ user.username }}</h3>
+        <div class="avatar-upload">
+            {% if request.user.profile.avatar %}
+            <img src="{{ request.user.profile.avatar.url }}"
+                 class="avatar-preview" alt="Аватар">
+
+            {% else %}
+                <div class="avatar-preview"
+                     style="width: 50px; height: 50 px; border-radius: 50%; background: #eee; cursor: pointer;">
+                </div>
+            {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="upload-btn" style="display: none">Загрузить</button>
+            <button onclick="document.getElementById('avatar-upload').click()"
+                class="btn btn-primary mt-3"><i class="fas fa-upload"></i>Обновить</button>
+        </form>
+
+
+        </div>
+    </div>
+<script>
+document.getElementById('avatar-upload').addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatar-preview');
+            if (preview.tagName === 'IMG') {
+                preview.src = e.target.result;
+            } else {
+                preview.innerHTML = `<img src="${e.target.result}" width="150" style="border-radius:50%">`;
+            }
+            document.querySelector('form').submit();
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
+<style>
+.upload-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+</style>
+
+
+{% endblock %}

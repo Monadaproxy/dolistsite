@@ -1,0 +1,145 @@
+{% extends 'main/layout_for_forum.html' %}
+
+{% block content %}
+<div class="container mt-0">
+    <span class="forum_title" style="color: white"><h1>Форум</h1></span>
+    {% if user.is_authenticated %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Написать сообщение</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.text }}
+                <div class="file-upload">
+                 <label for="id_picture" class="custom-file-upload">
+                    <i class="fa fa-image"></i>Загрузить изображение
+                     <span id="file-name"> | Файл не выбран</span>
+                    </label>
+                    {{ form.picture }}
+                </div>
+
+                <div id="picture-preview" class="mt-3"></div>
+
+                <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <a href="{% url 'login' %}">Войдите</a>, чтобы написать сообщение.
+    </div>
+    {% endif %}
+
+    <div class="messages">
+        {% for message in messages %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {% if message.author.profile.avatar %}
+                        <img src="{{ message.author.profile.avatar.url }}"
+                                class="avatar-preview" alt="Аватар" style="float: left; height: 60px; width: 60px; border-radius: 50%">
+                    {% endif %}
+                    {{ message.author.username }}
+                    <small class="text-muted">{{ message.created_at }}</small>
+                </h5>
+                <p class="card-text">{{ message.text }}</p>
+                {% if message.picture %}
+                    <img src="{{ message.picture.url }}" alt="Изображение" style="max-width: 300px;">
+                {% endif %}
+                {% if message.author == request.user %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="suc_button">
+                            <a href="{% url 'forum-detail' message.id %}"><button class="btn btn-success" style="margin-top: -25px;">Открыть</a>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>Пока нет сообщений.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+<style>
+  .file-upload {
+    margin: 15px 0;
+  }
+  #id_picture {
+    display: none;
+  }
+  #picture-preview img {
+    max-width: 100%;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+  }
+
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        padding: 6px 12px;
+        cursor: pointer;
+        background: #f8f9fa;
+    }
+
+</style>>
+
+
+<script>
+document.getElementById('id_picture').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('image-preview');
+
+    if (file && file.type.match('image.*')) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" class="img-preview" style="max-width: 300px; margin-top: 10px;">`;
+        }
+
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = '<p style="color: red;">Выберите изображение (JPEG/PNG)</p>';
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('id_picture');
+  const fileName = document.getElementById('file-name');
+  const preview = document.getElementById('picture-preview');
+
+  if (fileInput) {
+    // Обработчик изменения файла
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+
+      if (file) {
+        // Показываем имя файла
+        fileName.textContent = file.name;
+
+        // Показываем превью для изображений
+        if (file.type.match('image.*')) {
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+            preview.innerHTML = `
+              <img src="${e.target.result}" alt="Превью">
+              <div>Размер: ${Math.round(file.size / 1024)} KB</div>
+            `;
+          }
+          reader.readAsDataURL(file);
+        } else {
+          preview.innerHTML = `<div>Файл не является изображением</div>`;
+        }
+      } else {
+        fileName.textContent = "Файл не выбран";
+        preview.innerHTML = "";
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
